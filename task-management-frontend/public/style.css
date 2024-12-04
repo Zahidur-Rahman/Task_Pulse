@@ -1,0 +1,191 @@
+body {
+  font-family: Raleway;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #502314;
+  line-height: 1em;
+}
+h1 {
+  font-weight: 900;
+  font-size: 80px;
+}
+h2 {
+  font-weight: 900;
+  font-size: 60px;
+}
+h3 {
+  font-weight: 700;
+  font-size: 35px;
+  line-height: 1.5em;
+}
+h4 {
+  font-weight: 500;
+  font-size: 25px;
+}
+h6 {
+  font-size: 20px;
+}
+
+p {
+  font-weight: 400;
+  line-height: 1.5em;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+#home_page section nav {
+  background: #b58f4f;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+/* Custom Navbar Styles */
+.navbar-custom {
+  background-color: #576574; /* Custom background color */
+  font-weight: 500;
+}
+
+.navbar-custom .navbar-brand h4 {
+  color: #ffffff; /* Custom text color for navbar brand */
+}
+
+.navbar-custom .navbar-nav .nav-link {
+  color: #ffffff; /* Custom color for navbar links */
+}
+
+.navbar-custom .navbar-nav .nav-link:hover {
+  color: #f1c40f; /* Hover effect for navbar links */
+}
+
+
+.table {
+  width: 100%;
+  table-layout: fixed; /* Ensures column widths respect CSS */
+}
+
+.table td,
+.table th {
+  height: 70px;
+  vertical-align: middle;
+}
+
+.description {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  text-align: center;
+}
+
+.table thead th {
+  font-weight: bold;
+}
+/* Modal Overlay */
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  backdrop-filter: blur(5px); /* Apply background blur */
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Styles */
+.modal.fade.show {
+  display: block; /* Ensure modal is shown */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Background blur */
+  backdrop-filter: blur(5px);
+  z-index: 1050;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+  max-width: 500px;
+  margin: 10% auto; /* Center the modal vertically */
+  max-height: 90vh; /* Ensure modal height doesn't exceed 90% of viewport height */
+  overflow-y: auto; /* Makes the modal scrollable if content exceeds height */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-button {
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px; /* Limit height to show only 5 options at a time */
+  overflow-y: auto; /* Enable scrolling */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  z-index: 1000;
+  margin-top: 2px;
+  padding: 0;
+  list-style: none;
+  box-sizing: border-box;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Ensure dropdown is only scrollable after 5 options */
+.dropdown-item {
+  font-size: 14px;
+  padding: 8px;
+}
