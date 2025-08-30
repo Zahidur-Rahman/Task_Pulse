@@ -1,21 +1,25 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
+import LogOut from "./Logout";
 
 export default function Header() {
+  const { user } = useAuth();
   return (
     <header id="main_menu">
-      <nav className="navbar navbar-expand-md navbar-light fixed-top navbar-custom">
+      <nav className="navbar navbar-expand-md navbar-light fixed-top navbar-modern">
         <div className="container">
-          <a href="#" className="navbar-brand d-flex">
+          <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/dashboard'} className="navbar-brand d-flex">
             <img
               src="/image/logo.webp"
               alt="Logo"
-              style={{ width: "40px", height: "40px" }}
+              style={{ width: "35px", height: "35px" }}
               className="me-2 float-start rounded-5"
             />
             <span>
-              <h4 className="fw-bold mt-2">TaskPulse</h4>
+              <h4 className="fw-bold mt-1" style={{fontSize: '1.3rem'}}>TaskPulse</h4>
             </span>
-          </a>
+          </Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -27,19 +31,21 @@ export default function Header() {
           <div id="mainmenu" className="collapse navbar-collapse">
             <ul className="navbar-nav ms-auto">
               <li>
-                <a className="nav-link" href="#">
-                  Home
-                </a>
+                <Link className="nav-link-modern" to={user?.role === 'admin' ? '/admin/dashboard' : '/dashboard'}>
+                  Dashboard
+                </Link>
               </li>
+              {user?.role !== 'admin' && (
+                <>
+                  <li>
+                    <Link className="nav-link-modern" to="/tasks">
+                      My Tasks
+                    </Link>
+                  </li>
+                </>
+              )}
               <li>
-                <a className="nav-link" href="#">
-                  About
-                </a>
-              </li>
-              <li>
-                <a className="nav-link" href="#">
-                  Contact Us
-                </a>
+                <LogOut />
               </li>
             </ul>
           </div>

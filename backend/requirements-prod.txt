@@ -1,0 +1,55 @@
+# Core FastAPI and ASGI
+fastapi==0.100.0
+uvicorn[standard]==0.22.0
+gunicorn==21.2.0
+
+# Database - Async Support
+sqlalchemy[asyncio]==2.0.13
+asyncpg==0.29.0  # Async PostgreSQL driver
+psycopg2-binary==2.9.6  # Fallback sync driver
+alembic==1.11.1
+
+# Security and Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt,argon2]==1.7.4
+python-multipart==0.0.6
+
+# Environment and Configuration
+python-dotenv==1.0.0
+pydantic[email]==2.9.0
+pydantic-settings==2.6.1
+
+# HTTP and API
+httpx==0.24.1
+requests==2.31.0
+aiohttp==3.9.1
+
+# Template Engine
+jinja2==3.1.2
+aiofiles==23.1.0
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Production and Monitoring
+prometheus-client==0.17.1
+structlog==23.1.0
+sentry-sdk[fastapi]==1.32.0
+
+# Performance and Caching
+redis==4.6.0
+celery==5.3.1
+aioredis==2.0.1  # Async Redis client
+
+# Async Utilities
+asyncio-mqtt==0.16.1
+aio-pika==9.3.0
+
+# Development and Debugging (remove in production)
+# ipython==8.15.0
+# black==23.7.0
+# flake8==6.0.0
+# mypy==1.5.1 

@@ -1,15 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header.js";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="home_page" >
-      <section>
-        <Header />
-      </section>
 
       <section className="container pb-md-5 py-3 mt-5" style={{marginTop:"66px"}} >
         

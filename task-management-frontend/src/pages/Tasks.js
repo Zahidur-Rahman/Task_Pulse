@@ -14,7 +14,7 @@ import {
 import { useAuth } from "../context/AuthProvider.js";
 
 export default function Tasks() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { logout } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
@@ -32,7 +32,7 @@ export default function Tasks() {
 
   // Centralized token validation
   const ensureAuthenticated = () => {
-    if (!token) {
+    if (!isAuthenticated) {
       setError("You need to log in first.");
       navigate("/login");
       return false;
@@ -44,7 +44,7 @@ export default function Tasks() {
   const fetchAvailableAssignees = async (taskId) => {
     if (!ensureAuthenticated()) return;
     try {
-      const response = await allAssignees(taskId, token);
+      const response = await allAssignees();
       setAvailableAssignees(response.data);
     } catch (err) {
       setError("Failed to load available assignees.");
@@ -60,7 +60,7 @@ export default function Tasks() {
         return;
       }
       try {
-        const response = await getAllTask(token, page, isAscending);
+        const response = await getAllTask(page, isAscending);
         console.log(response);
         setTasks(response.data.tasks);
         setTotalPages(Math.ceil(response.data.total / response.data.limit));
@@ -69,8 +69,8 @@ export default function Tasks() {
         console.error(err.response?.data || err);
       }
     };
-    if (token) fetchTasks();
-  }, [token, page, isAscending]);
+    if (isAuthenticated) fetchTasks();
+  }, [isAuthenticated, page, isAscending]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -80,7 +80,7 @@ export default function Tasks() {
   const handleEditSubmit = async () => {
     if (!ensureAuthenticated()) return;
     try {
-      await updateTask(editingTask.id, editedData, token);
+      await updateTask(editingTask.id, editedData);
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === editingTask.id ? { ...task, ...editedData } : task
@@ -97,7 +97,7 @@ export default function Tasks() {
   const handleDelete = async (taskId) => {
     if (!ensureAuthenticated()) return;
     try {
-      await deleteTask(taskId, token);
+      await deleteTask(taskId);
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
     } catch (err) {
       setError("Failed to delete the task.");
@@ -108,7 +108,7 @@ export default function Tasks() {
   const handleStatusUpdate = async (status) => {
     if (!ensureAuthenticated() || !currentTask) return;
     try {
-      await updateTaskStatus(currentTask.id, status, token);
+      await updateTaskStatus(currentTask.id, status);
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === currentTask.id ? { ...task, status } : task
@@ -124,7 +124,7 @@ export default function Tasks() {
   const handleAssigneeChange = async (assigneeEmail) => {
     if (!ensureAuthenticated() || !currentTask) return;
     try {
-      await changeAssignee(currentTask.id, assigneeEmail, token);
+      await changeAssignee(currentTask.id, assigneeEmail);
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === currentTask.id

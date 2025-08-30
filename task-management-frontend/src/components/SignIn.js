@@ -17,10 +17,23 @@ export default function SignIn() {
     setError("");
     try {
       const response = await loginUser({ email, password });
-      const token = response.data.access_token;
-      login(token);
-      console.log("Login successful:", token);
-      navigate("/tasks");
+      
+      // Get user info from the response
+      const userData = {
+        id: response.data.user.id,
+        email: response.data.user.email,
+        role: response.data.user.role
+      };
+      
+      login(null, userData);
+      console.log("Login successful:", userData);
+      
+      // Redirect based on user role
+      if (userData.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error("Login failed:", err.response?.data || err);
       setError("Invalid email or password. Please try again.");

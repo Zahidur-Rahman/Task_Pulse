@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: task_pulse_db
+    environment:
+      POSTGRES_DB: task_pulse_db
+      POSTGRES_USER: task_user
+      POSTGRES_PASSWORD: task_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U task_user -d task_pulse_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - task_pulse_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: task_pulse_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - task_pulse_network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task_pulse_backend
+    environment:
+      - ENVIRONMENT=development
+      - POSTGRES_USER=task_user
+      - POSTGRES_PASSWORD=task_password_123
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=task_pulse_db
+      - SUPER_SECRET=your_super_secret_key_here_make_it_at_least_32_characters_long
+      - REDIS_URL=redis://redis:6379
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - task_pulse_network
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "info"]
+
+  # Frontend (optional - you can run this locally with npm)
+  frontend:
+    build:
+      context: ./task-management-frontend
+      dockerfile: Dockerfile
+    container_name: task_pulse_frontend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./task-management-frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:7000
+    depends_on:
+      - backend
+    networks:
+      - task_pulse_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend_logs:
+
+networks:
+  task_pulse_network:
+    driver: bridge 

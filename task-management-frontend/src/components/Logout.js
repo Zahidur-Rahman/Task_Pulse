@@ -6,16 +6,15 @@ export default function LogOut() {
   const navigate = useNavigate();
   const {logout}=useAuth();
 
-  const handleSubmit = () => {
-    logout();
-    navigate("/"); 
+  const handleSubmit = async () => {
+    await logout();
+    navigate("/login"); 
   };
 
   return (
-    <button type="button" onClick={handleSubmit} className="btn btn-sm btn-primary mb-1">
-      Log Out
-
-      <i className="bi bi-box-arrow-left ms-1" ></i>
+    <button type="button" onClick={handleSubmit} className="btn-modern btn-modern-danger" style={{padding: '6px 12px', fontSize: '0.85rem'}}>
+      <i className="bi bi-box-arrow-left me-1"></i>
+      Logout
     </button>
   );
 }

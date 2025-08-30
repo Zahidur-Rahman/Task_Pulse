@@ -4,14 +4,14 @@ import { useAuth } from "../context/AuthProvider";
 
 export default function NewTask() {
   const navigate = useNavigate();
-  const { token } = useAuth(); // Get token from context
+  const { isAuthenticated } = useAuth(); // Get authentication status from context
 
   const handleSubmit = () => {
-    if (!token) {
-      // If no token, redirect to login page
+    if (!isAuthenticated) {
+      // If not authenticated, redirect to login page
       navigate("/login"); 
     } else {
-      // If token exists, navigate to new task page
+      // If authenticated, navigate to new task page
       navigate("/newtask");
     }
   };
