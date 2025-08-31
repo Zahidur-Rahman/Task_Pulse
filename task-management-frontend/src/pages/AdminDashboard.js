@@ -78,9 +78,10 @@ const AdminDashboard = () => {
   return (
     <div>
       <Header />
-      <div className="container-fluid py-3" style={{ marginTop: '66px', minHeight: '100vh' }}>
-        <div className="mb-3">
-          <h6 className="text-muted mb-0">Admin Dashboard</h6>
+      <div className="container-fluid py-4" style={{ marginTop: '80px', minHeight: '100vh' }}>
+        <div className="mb-4">
+          <h2 className="mb-1">Admin Dashboard</h2>
+          <p className="text-muted mb-0">System Overview & Management</p>
         </div>
         <div className="row">
           <div className="col-12">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
-import { getAllTask, updateTaskStatus } from '../services/TaskService';
+import { getAllTask, getAllTasksAdmin, updateTaskStatus } from '../services/TaskService';
 import Header from '../components/Header';
 
 const TasksPage = () => {
@@ -20,19 +20,32 @@ const TasksPage = () => {
 
       try {
         setLoading(true);
-        const tasksResponse = await getAllTask(1, true, 50);
+        let tasksResponse;
+        
+        // Use admin endpoint if user is admin, otherwise use regular endpoint
+        if (user?.role === 'admin') {
+          tasksResponse = await getAllTasksAdmin(1, true, 50);
+        } else {
+          tasksResponse = await getAllTask(1, true, 50);
+        }
+        
         console.log('Tasks response:', tasksResponse);
+        console.log('User role:', user?.role);
+        console.log('Is admin:', user?.role === 'admin');
+        console.log('Response data:', tasksResponse.data);
         setTasks(Array.isArray(tasksResponse.data) ? tasksResponse.data : []);
       } catch (err) {
         console.error('Error fetching tasks:', err);
-        setError('Failed to load tasks');
+        console.error('Error details:', err.response?.data);
+        console.error('Error status:', err.response?.status);
+        setError(`Failed to load tasks: ${err.response?.data?.detail || err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTasks();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
@@ -62,7 +75,7 @@ const TasksPage = () => {
   return (
     <div>
       <Header />
-      <div className="container-fluid py-4" style={{ marginTop: '66px' }}>
+      <div className="container-fluid py-4" style={{ marginTop: '80px' }}>
         {error && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
             {error}
@@ -76,7 +89,12 @@ const TasksPage = () => {
             <div className="d-flex justify-content-between align-items-center">
               <div>
                 <h2 className="mb-0">All Tasks</h2>
-                <p className="text-muted">Manage and track all your tasks</p>
+                <p className="text-muted">
+                  {user?.role === 'admin' 
+                    ? 'System-wide Task Management' 
+                    : 'Manage and track all your tasks'
+                  }
+                </p>
               </div>
               <button 
                 className="btn btn-primary"
@@ -93,7 +111,9 @@ const TasksPage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="mb-0">Your Tasks ({tasks.length})</h5>
+                <h5 className="mb-0">
+                  {user?.role === 'admin' ? 'All System Tasks' : 'Your Tasks'} ({tasks.length})
+                </h5>
               </div>
               <div className="card-body">
                 {tasks.length === 0 ? (
@@ -110,59 +130,71 @@ const TasksPage = () => {
                   </div>
                 ) : (
                   <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
+                    <table className="table table-hover table-striped">
+                      <thead className="table-light">
                         <tr>
-                          <th>Title</th>
-                          <th>Type</th>
-                          <th>Priority</th>
-                          <th>Status</th>
-                          <th>Assignee</th>
-                          <th>Due Date</th>
-                          <th>Actions</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Title</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Type</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Priority</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Status</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Assignee</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Due Date</th>
+                          <th style={{fontSize: '1rem', padding: '1rem'}}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {tasks.map((task) => (
-                          <tr key={task.id} className={`task-item priority-${task.priority?.toLowerCase() || 'low'}`}>
-                            <td>
-                              <strong>{task.title}</strong>
+                        {tasks.filter(task => task.status !== 'completed').map((task) => (
+                          <tr key={task.id} className={`task-item priority-${task.priority?.toLowerCase() || 'low'}`} style={{fontSize: '1rem'}}>
+                            <td style={{padding: '1rem'}}>
+                              <strong style={{fontSize: '1.1rem'}}>{task.title}</strong>
                               {task.description && (
                                 <>
                                   <br />
-                                  <small className="text-muted">{task.description.substring(0, 50)}...</small>
+                                  <small className="text-muted" style={{fontSize: '0.9rem'}}>{task.description.substring(0, 50)}...</small>
                                 </>
                               )}
                             </td>
-                            <td>
-                              <span className="badge bg-secondary">{task.task_type || 'General'}</span>
+                            <td style={{padding: '1rem'}}>
+                              <span className="badge bg-secondary" style={{fontSize: '0.8rem', padding: '0.5rem 0.75rem'}}>{task.task_type || 'General'}</span>
                             </td>
-                            <td>
-                              <span className={`badge priority-${task.priority?.toLowerCase() || 'low'}`}>
-                                {task.priority || 'Low'}
+                            <td style={{padding: '1rem'}}>
+                              <span className={`badge priority-${task.priority?.toLowerCase() || 'low'}`} style={{fontSize: '0.8rem', padding: '0.5rem 0.75rem'}}>
+                                {task.priority === 'high' ? '🔴 High' : task.priority === 'medium' ? '🟡 Medium' : '🟢 Low'}
                               </span>
                             </td>
-                            <td>
-                              <span className={`badge status-${task.status?.toLowerCase().replace(' ', '-') || 'todo'}`}>
-                                {task.status || 'To Do'}
+                            <td style={{padding: '1rem'}}>
+                              <select 
+                                className="form-select form-select-sm"
+                                value={task.status || 'pending'}
+                                onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                                style={{fontSize: '0.9rem', minWidth: '120px'}}
+                              >
+                                <option value="pending">📋 Pending</option>
+                                <option value="in_progress">⏳ In Progress</option>
+                                <option value="completed">✅ Completed</option>
+                              </select>
+                            </td>
+                            <td style={{padding: '1rem'}}>
+                              <span style={{fontSize: '0.95rem'}}>
+                                {task.assignee 
+                                  ? `${task.assignee.first_name || ''} ${task.assignee.last_name || ''}`.trim()
+                                  : `${user?.first_name || ''} ${user?.last_name || ''}`.trim() + ' (You)'}
                               </span>
                             </td>
-                            <td>
-                              {task.assignee 
-                                ? `${task.assignee.first_name} ${task.assignee.last_name}`
-                                : user?.first_name + ' ' + user?.last_name + ' (You)'}
+                            <td style={{padding: '1rem'}}>
+                              <span style={{fontSize: '0.95rem'}}>
+                                {task.due_date 
+                                  ? new Date(task.due_date).toLocaleDateString()
+                                  : <span className="text-muted">No due date</span>}
+                              </span>
                             </td>
-                            <td>
-                              {task.due_date 
-                                ? new Date(task.due_date).toLocaleDateString()
-                                : <span className="text-muted">No due date</span>}
-                            </td>
-                            <td>
+                            <td style={{padding: '1rem'}}>
                               <div className="btn-group" role="group">
                                 <button
                                   className="btn btn-sm btn-outline-primary"
                                   onClick={() => navigate(`/task/${task.id}`)}
                                   title="View Details"
+                                  style={{padding: '0.5rem 0.75rem'}}
                                 >
                                   <i className="fas fa-eye"></i>
                                 </button>
@@ -170,9 +202,20 @@ const TasksPage = () => {
                                   className="btn btn-sm btn-outline-secondary"
                                   onClick={() => navigate(`/task/${task.id}/edit`)}
                                   title="Edit Task"
+                                  style={{padding: '0.5rem 0.75rem'}}
                                 >
                                   <i className="fas fa-edit"></i>
                                 </button>
+                                {task.status !== 'completed' && (
+                                  <button
+                                    className="btn btn-sm btn-outline-success"
+                                    onClick={() => handleStatusChange(task.id, 'completed')}
+                                    title="Mark Complete"
+                                    style={{padding: '0.5rem 0.75rem'}}
+                                  >
+                                    <i className="fas fa-check"></i>
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>

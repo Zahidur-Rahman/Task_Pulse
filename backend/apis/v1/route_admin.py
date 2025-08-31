@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from db.session import get_db
 from apis.v1.route_login import get_current_active_user
 from db.models.user import User, UserRole
+from db.models.task import Task
 from db.repository.task import get_admin_dashboard, get_user_task_summary, create_task_with_subtasks
 from db.repository.user import user_repository
 from schemas.task import AdminDashboard, UserTaskSummary, TaskCreate, TaskResponse
@@ -456,6 +457,59 @@ async def get_user_performance_report(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve performance report: {str(e)}"
+        )
+
+@router.get("/tasks", response_model=List[TaskResponse])
+async def get_all_tasks_admin(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(50, ge=1, le=100, description="Number of records to return"),
+    status_filter: Optional[str] = Query(None, description="Filter by task status"),
+    priority_filter: Optional[str] = Query(None, description="Filter by task priority"),
+    current_user: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all tasks in the system (admin only)."""
+    try:
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        from sqlalchemy.orm import selectinload
+        
+        # First, let's check if there are any tasks at all
+        count_query = select(func.count(Task.id))
+        count_result = await db.execute(count_query)
+        total_tasks = count_result.scalar()
+        logger.info(f"Total tasks in database: {total_tasks}")
+        
+        # Build query to get all tasks with assignee information
+        query = select(Task).options(
+            selectinload(Task.assignee),
+            selectinload(Task.author)
+        )
+        
+        # Apply filters if provided
+        if status_filter:
+            query = query.filter(Task.status == status_filter)
+            logger.info(f"Applied status filter: {status_filter}")
+        if priority_filter:
+            query = query.filter(Task.priority == priority_filter)
+            logger.info(f"Applied priority filter: {priority_filter}")
+            
+        # Apply pagination and ordering
+        query = query.order_by(Task.created_at.desc()).offset(skip).limit(limit)
+        logger.info(f"Query parameters - skip: {skip}, limit: {limit}")
+        
+        result = await db.execute(query)
+        tasks = result.scalars().all()
+        logger.info(f"Retrieved {len(tasks)} tasks for admin")
+        
+        return tasks
+        
+    except Exception as e:
+        logger.error(f"Error retrieving all tasks for admin: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve tasks: {str(e)}"
         )
 
 @router.post("/tasks", response_model=TaskResponse)

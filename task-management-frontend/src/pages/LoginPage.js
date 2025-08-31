@@ -180,7 +180,7 @@ const LoginPage = () => {
             </form>
 
             <div className="login-footer">
-              <p style={{fontSize: '0.9rem', marginBottom: '0'}}>
+              <p style={{fontSize: '0.9rem', marginBottom: '1rem'}}>
                 Don't have an account?{' '}
                 <button
                   type="button"
@@ -190,6 +190,18 @@ const LoginPage = () => {
                   Sign up here
                 </button>
               </p>
+              
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => navigate('/')}
+                  style={{fontSize: '0.85rem', padding: '0.5rem 1rem'}}
+                >
+                  <i className="bi bi-house me-1"></i>
+                  Back to Homepage
+                </button>
+              </div>
             </div>
           </div>
         </div>

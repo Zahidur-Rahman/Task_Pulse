@@ -52,8 +52,9 @@ async def create_task(
         logger.info(f"Task creation from IP: {client_ip} by user: {current_user.email}")
         
         # Use the enhanced task creation with multiple assignees support
-        from db.repository.task import create_task_with_subtasks
-        task_obj = await create_task_with_subtasks(task_data=task, db=db, author_id=current_user.id)
+        from db.repository.task import TaskRepository
+        task_repo = TaskRepository()
+        task_obj = await task_repo.create_task_with_subtasks(task_data=task, db=db, author_id=current_user.id)
         return TaskResponse.model_validate(task_obj)
         
     except Exception as e:

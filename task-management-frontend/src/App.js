@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import TasksPage from './pages/TasksPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminTaskList from './pages/AdminTaskList';
 import HomePage from './pages/HomePage';
 import CreateTaskPage from './pages/CreateTaskPage';
 import TaskDetails from './components/TaskDetails';
@@ -107,9 +108,21 @@ function App() {
           } />
           
           {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } />
+          
           <Route path="/admin/dashboard" element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          } />
+          
+          <Route path="/admin/tasks" element={
+            <AdminRoute>
+              <AdminTaskList />
             </AdminRoute>
           } />
           

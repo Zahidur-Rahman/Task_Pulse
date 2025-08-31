@@ -93,7 +93,7 @@ const DashboardPage = () => {
   return (
     <div>
       <Header />
-      <div className="container-fluid py-3" style={{ marginTop: '66px', minHeight: '100vh' }}>
+      <div className="container-fluid py-4" style={{ marginTop: '80px', minHeight: '100vh' }}>
         {error && (
           <div className="alert alert-warning alert-dismissible fade show" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i>
@@ -101,12 +101,13 @@ const DashboardPage = () => {
             <button type="button" className="btn-close" onClick={() => setError('')}></button>
           </div>
         )}
-        <div className="mb-3">
-          <h6 className="text-muted mb-0">Task Overview</h6>
+        <div className="mb-4">
+          <h2 className="mb-1">Dashboard</h2>
+          <p className="text-muted mb-0">Task Overview</p>
         </div>
         {/* Dashboard Stats */}
         {dashboardData && (
-          <div className="row mb-3">
+          <div className="row mb-5">
             <div className="col-md-3 mb-2">
               <div className="dashboard-stat-card">
                 <div className="dashboard-stat-number">{tasks.length || 0}</div>
@@ -136,27 +137,27 @@ const DashboardPage = () => {
 
         {/* Recent Tasks Section */}
         <div className="row">
-          <div className="col-12">
+          <div className="col-lg-8 mb-4">
             <div className="card">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h6 className="mb-0">Recent Tasks</h6>
+                <h5 className="mb-0">Active Tasks</h5>
                 <div className="d-flex gap-2">
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary"
                   >
                     <i className="bi bi-plus me-1"></i>
                     Create Task
                   </button>
                   <button
                     onClick={() => navigate('/tasks')}
-                    className="btn btn-outline-secondary btn-sm"
+                    className="btn btn-outline-secondary"
                   >
                     View All
                   </button>
                 </div>
               </div>
-              <div className="card-body" style={{ maxHeight: tasks.length > 4 ? '400px' : 'auto', overflowY: tasks.length > 4 ? 'auto' : 'visible' }}>
+              <div className="card-body" style={{ minHeight: '300px' }}>
                 {tasks.length === 0 ? (
                   <div className="text-center py-3">
                     <div className="text-muted mb-2">
@@ -172,7 +173,7 @@ const DashboardPage = () => {
                   </div>
                 ) : (
                   <div className="list-group list-group-flush">
-                    {tasks.slice(0, 8).map((task) => (
+                    {tasks.filter(t => t.status !== 'completed').slice(0, 5).map((task) => (
                       <div className="list-group-item border-0 px-0 py-2" key={task.id}>
                         <div className="d-flex justify-content-between align-items-start">
                           <div className="flex-grow-1">
@@ -203,6 +204,48 @@ const DashboardPage = () => {
                                 {task.status.replace('_', ' ')}
                               </span>
                             </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Completed Tasks Section */}
+          <div className="col-lg-4 mb-4">
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <h5 className="mb-0">Recently Completed</h5>
+                <span className="badge bg-success">{tasks.filter(t => t.status === 'completed').length}</span>
+              </div>
+              <div className="card-body" style={{ minHeight: '300px' }}>
+                {tasks.filter(t => t.status === 'completed').length === 0 ? (
+                  <div className="text-center py-4">
+                    <div className="text-muted mb-2">
+                      <i className="bi bi-check-circle" style={{ fontSize: '2rem' }}></i>
+                    </div>
+                    <p className="text-muted mb-0">No completed tasks yet</p>
+                  </div>
+                ) : (
+                  <div className="list-group list-group-flush">
+                    {tasks.filter(t => t.status === 'completed').slice(0, 5).map((task) => (
+                      <div className="list-group-item border-0 px-0 py-2" key={task.id}>
+                        <div className="d-flex align-items-start">
+                          <div className="me-2 text-success">
+                            <i className="bi bi-check-circle-fill"></i>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1 fw-medium text-decoration-line-through text-muted" style={{ fontSize: '0.875rem' }}>
+                              {task.title}
+                            </h6>
+                            {task.completed_at && (
+                              <small className="text-muted">
+                                Completed: {new Date(task.completed_at).toLocaleDateString()}
+                              </small>
+                            )}
                           </div>
                         </div>
                       </div>

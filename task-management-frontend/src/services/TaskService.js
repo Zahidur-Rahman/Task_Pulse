@@ -171,6 +171,18 @@ const getUserDashboard = () =>
 const getAdminDashboard = () =>
   api.get("/admin/dashboard");
 
+// Admin endpoint to get all tasks in the system
+const getAllTasksAdmin = (page = 1, isAscending = true, limit = 50) =>
+  api.get("/admin/tasks", {
+    headers: {
+      Accept: "application/json",
+    },
+    params: {
+      skip: (page - 1) * limit,
+      limit
+    },
+  });
+
 const createSubtask = (taskId, subtask) =>
   api.post(
     `/task/${taskId}/subtasks`,
@@ -222,6 +234,7 @@ const registerUser = SignUpUser;
 
 export {
   getAllTask,
+  getAllTasksAdmin,
   createTask,
   createAdminTask,
   deleteTask,
